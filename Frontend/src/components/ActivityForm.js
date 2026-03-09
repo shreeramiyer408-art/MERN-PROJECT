@@ -20,21 +20,41 @@ function ActivityForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await API.post("/", {
-      activityName: form.activityName,
-      duration: Number(form.duration),
-      intensity: form.intensity,
-      category: form.category,
-      caloriesBurned: Number(form.caloriesBurned),
-      stats: {
-        steps: Number(form.steps),
-        heartRate: Number(form.heartRate),
-        distance: Number(form.distance)
-      }
-    });
+    try {
 
-    alert("Activity Added!");
-    window.location.reload();
+      await API.post("/", {
+        activityName: form.activityName,
+        duration: Number(form.duration) || 0,
+        intensity: form.intensity,
+        category: form.category,
+        caloriesBurned: Number(form.caloriesBurned) || 0,
+
+        stats: {
+          steps: Number(form.steps) || 0,
+          heartRate: Number(form.heartRate) || 0,
+          distance: Number(form.distance) || 0
+        }
+      });
+
+      alert("Activity Added!");
+
+      setForm({
+        activityName: "",
+        duration: "",
+        intensity: "Low",
+        category: "",
+        caloriesBurned: "",
+        steps: "",
+        heartRate: "",
+        distance: ""
+      });
+
+      window.location.reload();
+
+    } catch (error) {
+      console.error("Error adding activity:", error);
+      alert("Failed to add activity");
+    }
   };
 
   return (
@@ -43,6 +63,7 @@ function ActivityForm() {
       <input
         name="activityName"
         placeholder="Activity Name"
+        value={form.activityName}
         className="w-full p-3 rounded-xl border border-white/30 bg-white/30 backdrop-blur-md text-white placeholder-white"
         onChange={handleChange}
         required
@@ -51,6 +72,7 @@ function ActivityForm() {
       <input
         name="duration"
         placeholder="Duration (min)"
+        value={form.duration}
         className="w-full p-3 rounded-xl border border-white/30 bg-white/30 backdrop-blur-md text-white placeholder-white"
         onChange={handleChange}
         required
@@ -58,6 +80,7 @@ function ActivityForm() {
 
       <select
         name="intensity"
+        value={form.intensity}
         className="w-full p-3 rounded-xl border border-white/30 bg-white/30 backdrop-blur-md text-white"
         onChange={handleChange}
       >
@@ -69,6 +92,7 @@ function ActivityForm() {
       <input
         name="category"
         placeholder="Category"
+        value={form.category}
         className="w-full p-3 rounded-xl border border-white/30 bg-white/30 backdrop-blur-md text-white placeholder-white"
         onChange={handleChange}
         required
@@ -77,14 +101,17 @@ function ActivityForm() {
       <input
         name="caloriesBurned"
         placeholder="Calories Burned"
+        value={form.caloriesBurned}
         className="w-full p-3 rounded-xl border border-white/30 bg-white/30 backdrop-blur-md text-white placeholder-white"
         onChange={handleChange}
       />
 
       <div className="grid grid-cols-3 gap-4">
+
         <input
           name="steps"
           placeholder="Steps"
+          value={form.steps}
           className="p-3 rounded-xl border border-white/30 bg-white/30 backdrop-blur-md text-white placeholder-white"
           onChange={handleChange}
         />
@@ -92,6 +119,7 @@ function ActivityForm() {
         <input
           name="heartRate"
           placeholder="Heart Rate"
+          value={form.heartRate}
           className="p-3 rounded-xl border border-white/30 bg-white/30 backdrop-blur-md text-white placeholder-white"
           onChange={handleChange}
         />
@@ -99,9 +127,11 @@ function ActivityForm() {
         <input
           name="distance"
           placeholder="Distance (km)"
+          value={form.distance}
           className="p-3 rounded-xl border border-white/30 bg-white/30 backdrop-blur-md text-white placeholder-white"
           onChange={handleChange}
         />
+
       </div>
 
       <button
