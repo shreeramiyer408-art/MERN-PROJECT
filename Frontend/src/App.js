@@ -9,6 +9,9 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
 
+  const [activityError, setActivityError] = useState("");
+  const [activitySuccess, setActivitySuccess] = useState("");
+
   const [clientData, setClientData] = useState({
     name: "",
     age: "",
@@ -158,11 +161,29 @@ function App() {
     setActivePage("Dashboard");
   };
 
+  const totalActivities = activities.length;
+  const totalCalories = activities.reduce(
+    (sum, item) => sum + (Number(item.caloriesBurned) || 0),
+    0
+  );
+
+  const avgDuration =
+    totalActivities > 0
+      ? Math.round(
+          activities.reduce(
+            (sum, item) => sum + (Number(item.duration) || 0),
+            0
+          ) / totalActivities
+        )
+      : 0;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setActivityError("");
+    setActivitySuccess("");
 
     try {
-      await API.post("/", {
+      const payload = {
         activityName: form.activityName,
         duration: Number(form.duration),
         intensity: form.intensity,
@@ -185,7 +206,10 @@ function App() {
           weight: Number(form.monthlyWeight) || 0,
           month: form.monthlyWeightMonth,
         },
-      });
+      };
+
+      const res = await API.post("/", payload);
+      console.log("Activity saved:", res.data);
 
       setForm({
         activityName: "",
@@ -203,10 +227,16 @@ function App() {
         monthlyWeightMonth: "",
       });
 
-      fetchActivities();
+      setActivitySuccess("Activity added successfully.");
+      await fetchActivities();
       setActivePage("Activities");
     } catch (err) {
       console.error("Error adding activity:", err);
+      setActivityError(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          "Failed to add activity. Check category and required fields."
+      );
     }
   };
 
@@ -222,22 +252,6 @@ function App() {
   const handleExportPDF = () => {
     window.print();
   };
-
-  const totalActivities = activities.length;
-  const totalCalories = activities.reduce(
-    (sum, item) => sum + (Number(item.caloriesBurned) || 0),
-    0
-  );
-
-  const avgDuration =
-    totalActivities > 0
-      ? Math.round(
-          activities.reduce(
-            (sum, item) => sum + (Number(item.duration) || 0),
-            0
-          ) / totalActivities
-        )
-      : 0;
 
   const dailyGoalTarget = Number(clientData.dailyGoalTarget) || 0;
   const dailyGoalProgress = dailyGoalTarget
@@ -517,15 +531,20 @@ function App() {
                 <option value="Medium">Medium</option>
                 <option value="High">High</option>
               </select>
-              <input
-                type="text"
+              <select
                 name="category"
-                placeholder="Category"
                 value={form.category}
                 onChange={handleChange}
                 className="border border-slate-300 rounded-xl px-4 py-3 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-400 outline-none"
                 required
-              />
+              >
+                <option value="">Select Category</option>
+                <option value="Cardio">Cardio</option>
+                <option value="Strength">Strength</option>
+                <option value="Yoga">Yoga</option>
+                <option value="Sports">Sports</option>
+                <option value="Other">Other</option>
+              </select>
               <input
                 type="number"
                 name="caloriesBurned"
@@ -599,6 +618,14 @@ function App() {
                 className="border border-slate-300 rounded-xl px-4 py-3 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-400 outline-none xl:col-span-2"
               />
             </div>
+
+            {activityError && (
+              <p className="text-red-600 font-medium">{activityError}</p>
+            )}
+
+            {activitySuccess && (
+              <p className="text-green-600 font-medium">{activitySuccess}</p>
+            )}
 
             <button
               type="submit"
@@ -893,7 +920,7 @@ function App() {
       <div className="flex">
         <aside className="hidden md:flex w-64 min-h-screen bg-black text-white flex-col p-6">
           <h1 className="text-2xl font-bold mb-10 text-yellow-400">
-            FitnessPro
+            FitnessTracker
           </h1>
 
           <nav className="space-y-2">
@@ -929,3 +956,4 @@ function App() {
 }
 
 export default App;
+ this is my current code please give me corrected whole code to make the activity work properly
