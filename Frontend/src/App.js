@@ -893,7 +893,7 @@ function App() {
       <div className="flex">
         <aside className="hidden md:flex w-64 min-h-screen bg-black text-white flex-col p-6">
           <h1 className="text-2xl font-bold mb-10 text-yellow-400">
-            FitnessTracker
+            FitnessPro
           </h1>
 
           <nav className="space-y-2">
